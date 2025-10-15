@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Test2;
@@ -115,30 +116,40 @@ public class Factura: IABMEntidades<Factura>
 
     public bool Altas(Factura entidad)
     {
-        // crear y/o abrir la conexion al motor
-        //grabar la factura
+        string connStr = "Server=PCI;Database=TPPII;User Id=sa;Password=987123;TrustServerCertificate=True;";
 
-        var vNro = entidad.nro;
-        var vFecha = entidad.fecha;
-        var vCliente = entidad.cliente.dni;
-
-        // insert into factura (campo1, campo,,) 
-        // values (@nro, @fecha, @cliente)
-
-        //lista de parametros del insert
-        //@nro = vNro
-        //@fecha = vFecha
-        //@cliente = vCliente
-
-        //grabar el detalle de la factura
-        foreach (var item in entidad.detalle)
+        using (SqlConnection conn = new SqlConnection(connStr))
         {
-            item.Altas(item);
+            conn.Open();
+            Console.WriteLine("conex abierta");
+
+            try
+            {
+                string addFactura = @"INSERT INTO Factura (id, fecha, cliente_dni)
+                              VALUES (@id, @fecha, @cliente_dni)";
+
+
+                using (SqlCommand cmd = new SqlCommand(addFactura, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", entidad.nro);
+                    cmd.Parameters.AddWithValue("@fecha", entidad.fecha);
+                    cmd.Parameters.AddWithValue("@cliente_dni", entidad.cliente.dni);
+                    cmd.ExecuteNonQuery();
+                }
+
+                foreach (var item in entidad.detalle)
+                {
+                    item.Altas(item, conn);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("error al crear factura " + ex.Message);
+                return false;
+            }
         }
-
-        //cerrar la conexion
-
-        return true;
     }
 
     public bool Modificacion(Factura entidad)
@@ -173,29 +184,36 @@ public class DetalleFactura: IABMEntidades<DetalleFactura>
         return this.producto.preciounitario * this.cantidad;
     }
 
-    public bool Altas(DetalleFactura entidad)
+    public bool Altas(DetalleFactura entidad, SqlConnection conn)
     {
-        // crear y/o abrir la conexion al motor
-        //grabar el detalle de factura
 
-        var vIdFIla = entidad.idfila;
-        var vNroFactura = entidad.nroFactura;
-        var vProducto = entidad.producto.id;
-        var vCantidad = entidad.cantidad;
+        string addDetalle = @"INSERT INTO DetalleFactura (factura_id, producto_id, cantidad)
+                              VALUES (@factura_id, @producto_id, @cantidad)";
 
-        // insert into detallefactura (campo1, campo,,) 
-        // values (@idfila, @nrofactura, @producto, @cantidad)
+        try
+        {
+            using (SqlCommand cmd = new SqlCommand(addDetalle, conn))
+            {
+                cmd.Parameters.AddWithValue("@factura_id", entidad.nroFactura);
+                cmd.Parameters.AddWithValue("@producto_id", entidad.producto.id);
+                cmd.Parameters.AddWithValue("@cantidad", entidad.cantidad);
+                cmd.ExecuteNonQuery();
+            }
 
-        //lista de parametros del insert
-        //@idfila = vIdFila
-        //@nrofactura = vNroFactura
-        //@producto = vProducto
-        //@cantidad = vCantidad
+            Console.WriteLine("se creo todo con exito");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("error al insertar detalles " + ex.Message);
+        }
 
-        //cerrar la conexion
+
 
         return true;
     }
+
+    public bool Altas(DetalleFactura entidad) => throw new NotImplementedException();
+
 
     public bool Modificacion(DetalleFactura entidad)
     {

@@ -34,3 +34,4 @@ C:\Users\ignac\Downloads\Clases_Interfaces2\Test2\obj\Debug\net9.0\refint\Test2.
 C:\Users\ignac\Downloads\Clases_Interfaces2\Test2\obj\Debug\net9.0\Test2.pdb
 C:\Users\ignac\Downloads\Clases_Interfaces2\Test2\obj\Debug\net9.0\Test2.genruntimeconfig.cache
 C:\Users\ignac\Downloads\Clases_Interfaces2\Test2\obj\Debug\net9.0\ref\Test2.dll
+C:\Users\ignac\Downloads\Clases_Interfaces2\Test2\obj\Debug\net9.0\Test2.sourcelink.json

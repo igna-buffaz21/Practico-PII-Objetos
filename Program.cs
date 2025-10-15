@@ -47,52 +47,6 @@ class Program
 
         fac1.Altas(fac1);
 
-        string connStr = "Server=PCI;Database=TPPII;User Id=sa;Password=987123;TrustServerCertificate=True;";
-
-        using (SqlConnection conn = new SqlConnection(connStr))
-        {
-            conn.Open();
-            Console.WriteLine("conex con exito");
-
-            try
-            {
-                string addFactura = @"INSERT INTO Factura (id, fecha, cliente_dni)
-                              VALUES (@id, @fecha, @cliente_dni)";
-
-                using (SqlCommand cmd = new SqlCommand(addFactura, conn))
-                {
-                    cmd.Parameters.AddWithValue("@id", fac1.nro);
-                    cmd.Parameters.AddWithValue("@fecha", fac1.fecha);
-                    cmd.Parameters.AddWithValue("@cliente_dni", fac1.cliente.dni);
-                    cmd.ExecuteNonQuery();
-                }
-
-                string addDetalle = @"INSERT INTO DetalleFactura (factura_id, producto_id, cantidad)
-                              VALUES (@factura_id, @producto_id, @cantidad)";
-
-                foreach (var detalle in fac1.detalle)
-                {
-                    using (SqlCommand cmd = new SqlCommand(addDetalle, conn))
-                    {
-                        //cmd.Parameters.AddWithValue("@id", detalle.idfila);
-                        cmd.Parameters.AddWithValue("@factura_id", detalle.nroFactura);
-                        cmd.Parameters.AddWithValue("@producto_id", detalle.producto.id);
-                        cmd.Parameters.AddWithValue("@cantidad", detalle.cantidad);
-
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-
-                Console.WriteLine("guardado correctamente");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error " + ex.Message);
-                //throw new Exception("Error");
-            }
-        }
-
         //Console.WriteLine(fac1.CalcularTotal());
 
         // Console.WriteLine(renglon1.CalcularSubTotal());
